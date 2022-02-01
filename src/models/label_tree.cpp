@@ -30,6 +30,7 @@
 #include <random>
 #include <sstream>
 #include <vector>
+#include <iostream>
 
 #include "label_tree.h"
 #include "threads.h"
@@ -109,7 +110,7 @@ void LabelTree::buildTreeStructure(SRMatrix& labels, SRMatrix& features, Args& a
 
 TreeNodePartition LabelTree::buildKmeansTreeThread(TreeNodePartition nPart, SRMatrix& labelsFeatures, Args& args,
                                               int seed) {
-    kmeans(nPart.partition, labelsFeatures, args.arity, args.kmeansEps, args.kmeansBalanced, seed);
+  kmeans(nPart.partition, labelsFeatures, args.arity, args.kmeansEps, args.kmeansBalanced, seed);
     return nPart;
 }
 

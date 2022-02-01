@@ -38,6 +38,8 @@
 #include <future>
 #include <chrono>
 
+#include <iostream>
+
 using namespace std::chrono_literals;
 namespace py = pybind11;
 
@@ -200,8 +202,11 @@ public:
         runAsInterruptable([&] {
             SRMatrix labels;
             SRMatrix features;
+            // std::cout << "DEBUG: reading features" << std::endl;            
             readSRMatrix(features, inputFeatures, (InputDataType) featuresDataType, true);
+            // std::cout << "DEBUG: reading labels" << std::endl;            
             readSRMatrix(labels, inputLabels, (InputDataType) labelsDataType);
+            // std::cout << "DEBUG: fitHelper" << std::endl;            
             fitHelper(labels, features);
         });
     }
@@ -430,8 +435,7 @@ private:
             if (buffer.ndim != 2) throw py::value_error("Data must be a 2d array");
 
             size_t rows = buffer.shape[0];
-            size_t rSize = buffer.shape[1];
-
+            size_t rSize = buffer.shape[1];            
             // Read each row from the sparse matrix, and insert
             for (size_t r = 0; r < rows; ++r) {
                 const Real* rData = pyData.data(r);
@@ -452,11 +456,14 @@ private:
                 throw py::value_error("Expect csr_matrix CSR matrix");
             }
 
+            // std::cout << "reading CSR matrix" << std::endl;
+            
             // Try to interpret input data as a csr_matrix CSR matrix
             py::array_t<int> indptr(input.attr("indptr"));
             py::array_t<int> indices(input.attr("indices"));
             py::array_t<Real> data(input.attr("data"));
 
+            
             // Read each row from the sparse matrix, and insert
             for (int rId = 0; rId < indptr.size() - 1; ++rId) {
                 rVec.clear();
@@ -474,10 +481,12 @@ private:
 
     inline void fitHelper(SRMatrix& labels, SRMatrix& features){
         // Save args to file
+      // std::cout << "DEBUG: print args" << std::endl;
         args.printArgs("train");
         makeDir(args.output);
         args.saveToFile(joinPath(args.output, "args.bin"));
 
+        // std::cout << "DEBUG: train model" << std::endl;
         // Create and train model (train function also saves model)
         if(model == nullptr) model = Model::factory(args);
         model->train(labels, features, args, args.output);

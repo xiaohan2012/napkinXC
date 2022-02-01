@@ -24,6 +24,7 @@
 #include <climits>
 #include <cmath>
 #include <random>
+#include <iostream>
 
 #include "kmeans.h"
 #include "misc.h"
@@ -33,7 +34,7 @@
 void kmeans(std::vector<Assignation>* partition, SRMatrix& pointsFeatures, int centroids, Real eps,
             bool balanced, int seed) {
 
-    int points = partition->size();
+  int points = partition->size();
     int features = pointsFeatures.cols();
 
     // if(balanced) Log(CERR) << "Balanced K-Means ...\n  Partition: " << partition->size() << ", centroids: " <<
@@ -50,10 +51,12 @@ void kmeans(std::vector<Assignation>* partition, SRMatrix& pointsFeatures, int c
     // Init centroids
     Matrix centroidsFeatures(centroids, features);
 
+
     std::default_random_engine rng(seed);
-    std::uniform_int_distribution<int> dist(0, points);
-    for (int i = 0; i < centroids; ++i)
-        centroidsFeatures[i].add(pointsFeatures[dist(rng)]); // set centroid to this vector
+    std::uniform_int_distribution<int> dist(0, points-1);
+    for (int i = 0; i < centroids; ++i) {
+      centroidsFeatures[i].add(pointsFeatures[dist(rng)]); // set centroid to this vector
+    }
 
     double oldCos = INT_MIN, newCos = -1;
 
